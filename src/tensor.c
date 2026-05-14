@@ -23,7 +23,9 @@ Tensor* create_1D_tensor(f32 data, bool requires_grad) {
 Tensor* create_tensor(f32* data, u32* shape, u32 size, u32 num_dims, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
     t->data = malloc(sizeof(f32) * size);
-    t->data = data;
+    for (u32 i = 0; i < size; i++) {
+        t->data[i] = data[i];
+    }
 
     t->shape = malloc(num_dims * sizeof(u32));
     for (u32 i = 0; i < num_dims; i++) {
@@ -120,9 +122,7 @@ void free_tensor(Tensor* t) {
     if (t->next_functions != NULL) {
         free(t->next_functions);
     }
-    if (t->data != NULL) {
-        free(t->data);
-        free(t->shape);
-    }
+    free(t->data);
+    free(t->shape);
     free(t);
 }

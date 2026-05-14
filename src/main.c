@@ -7,12 +7,15 @@
 
 
 int main() {
-    u32 shape[3] = {2, 3, 4};
-    Tensor* a = create_zero_tensor(shape, 3, true);
+    Tensor* a = create_zero_tensor((u32[]){2, 3, 4}, 3, true);
+
+    Tensor* b = create_tensor((f32[]){1, 2, 3, 4, 5, 6, 7, 8, 9}, (u32[]){3, 3}, 9, 2, true);
 
     print_tensor(a);
+    print_tensor(b);
 
     free_tensor(a);
+    free_tensor(b);
 
     return 0;
 }
