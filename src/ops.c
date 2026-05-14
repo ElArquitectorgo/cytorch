@@ -40,6 +40,25 @@ Tensor* mul(Tensor* a, Tensor* b) {
     return t;
 }
 
+Tensor* divide(Tensor* a, Tensor* b) {
+    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
+
+    for (u32 i = 0; i < a->size; i++) {
+        t->data[i] = a->data[i] / b->data[i];
+    }
+    t->is_leaf = false;
+    
+    t->next_functions = malloc(2 * sizeof(Tensor*));
+    t->num_next_functions = 2;
+    t->next_functions[0] = a;
+    t->next_functions[1] = b;
+
+    if (t->requires_grad) {
+        t->grad_op = DIV;
+    }
+    return t;
+}
+
 Tensor* mat_mul(Tensor* a, Tensor* b) {
     // (m, n) x (n, o) = (m, o)
     u32 m = a->shape[0];
@@ -58,25 +77,6 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
             }
             t->data[row * o + col] = sum;
         }
-    }
-    return t;
-}
-
-Tensor* divide(Tensor* a, Tensor* b) {
-    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
-
-    for (u32 i = 0; i < a->size; i++) {
-        t->data[i] = a->data[i] / b->data[i];
-    }
-    t->is_leaf = false;
-    
-    t->next_functions = malloc(2 * sizeof(Tensor*));
-    t->num_next_functions = 2;
-    t->next_functions[0] = a;
-    t->next_functions[1] = b;
-
-    if (t->requires_grad) {
-        t->grad_op = DIV;
     }
     return t;
 }
