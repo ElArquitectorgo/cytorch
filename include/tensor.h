@@ -11,15 +11,11 @@ typedef enum {
     None,
 } op_type;
 
-typedef struct {
-    f32* values;
+typedef struct Tensor {
+    f32* data;
     u32* shape;
     u32 size;
     u8 num_dims;
-} Array;
-
-typedef struct Tensor {
-    Array* data;
     f32 grad;
     op_type grad_op;
     struct Tensor** next_functions;
@@ -29,7 +25,8 @@ typedef struct Tensor {
     bool visited;
 } Tensor;
 
-Tensor* create_tensor(Array* data, bool requires_grad);
+Tensor* create_1D_tensor(f32 data, bool requires_grad);
+Tensor* create_tensor(f32* data, u32* shape, u32 size, u32 num_dims, bool requires_grad);
 Tensor* create_zero_tensor(u32* shape, u32 num_dims, bool requires_grad);
 void print_tensor(Tensor* t);
 void free_tensor(Tensor* t);
