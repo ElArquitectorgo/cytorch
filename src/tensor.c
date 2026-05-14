@@ -1,6 +1,8 @@
 #include "tensor.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 Tensor* create_1D_tensor(f32 data, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
@@ -20,18 +22,23 @@ Tensor* create_1D_tensor(f32 data, bool requires_grad) {
     return t;
 }
 
-Tensor* create_tensor(f32* data, u32* shape, u32 size, u32 num_dims, bool requires_grad) {
+Tensor* create_2D_tensor(f32* data, u32* shape, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
-    t->data = malloc(sizeof(f32) * size);
-    for (u32 i = 0; i < size; i++) {
-        t->data[i] = data[i];
-    }
 
+    u32 num_dims = 2;
     t->shape = malloc(num_dims * sizeof(u32));
     for (u32 i = 0; i < num_dims; i++) {
         t->shape[i] = shape[i];
     }
-    t->size = size;
+
+    u32 num_values = 1;
+    for (u32 i = 0; i < num_dims; i++) {
+        num_values *= shape[i];
+    }
+    t->data = malloc(num_values * sizeof(f32));
+    memcpy(t->data, data, num_values * sizeof(f32));
+
+    t->size = num_values;
     t->num_dims = num_dims;
     
     t->grad = 0.0f;
@@ -47,7 +54,6 @@ Tensor* create_tensor(f32* data, u32* shape, u32 size, u32 num_dims, bool requir
 
 Tensor* create_zero_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
-
     u32 num_values = 1;
     for (u32 i = 0; i < num_dims; i++) {
         num_values *= shape[i];
@@ -56,6 +62,39 @@ Tensor* create_zero_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     t->data = malloc(sizeof(f32) * num_values);
     for (u32 i = 0; i < num_values; i++) {
         t->data[i] = 0.0f;
+    }
+
+    t->shape = malloc(num_dims * sizeof(u32));
+    for (u32 i = 0; i < num_dims; i++) {
+        t->shape[i] = shape[i];
+    }
+
+    t->size = num_values;
+    t->num_dims = num_dims;
+
+    t->grad = 0.0f;
+    
+    t->grad_op = None;
+    t->requires_grad = requires_grad;
+    t->is_leaf = true;
+    t->visited = false;
+
+    t->next_functions = NULL;
+    t->num_next_functions = 0;
+    return t;
+}
+
+Tensor* create_ones_tensor(u32* shape, u32 num_dims, bool requires_grad) {
+    Tensor* t = malloc(sizeof(Tensor));
+
+    u32 num_values = 1;
+    for (u32 i = 0; i < num_dims; i++) {
+        num_values *= shape[i];
+    }
+
+    t->data = malloc(sizeof(f32) * num_values);
+    for (u32 i = 0; i < num_values; i++) {
+        t->data[i] = 1.0f;
     }
 
     t->shape = malloc(num_dims * sizeof(u32));

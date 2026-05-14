@@ -49,8 +49,7 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
     assert(n == b->shape[0]);
 
     u32 shape[2] = {m, o};
-    u32 num_dims = 2;
-    Tensor* t = create_zero_tensor(shape, num_dims, a->requires_grad || b->requires_grad);
+    Tensor* t = create_zero_tensor(shape, 2, a->requires_grad || b->requires_grad);
     for (u32 row = 0; row < m; row++) {
         for (u32 col = 0; col < o; col++) {
             f32 sum = 0.0f;
