@@ -16,7 +16,7 @@ typedef struct Tensor {
     u32* shape;
     u32 size;
     u8 num_dims;
-    f32 grad;
+    f32* grad;
     op_type grad_op;
     struct Tensor** next_functions;
     u8 num_next_functions;
@@ -26,8 +26,8 @@ typedef struct Tensor {
 } Tensor;
 
 Tensor* create_1D_tensor(f32 data, bool requires_grad);
-Tensor* create_2D_tensor(f32* data, u32* shape, bool requires_grad);
-Tensor* create_zero_tensor(u32* shape, u32 num_dims, bool requires_grad);
+Tensor* create_tensor(f32* data, u32* shape, u32 num_dims, bool requires_grad);
+Tensor* create_zeros_tensor(u32* shape, u32 num_dims, bool requires_grad);
 Tensor* create_ones_tensor(u32* shape, u32 num_dims, bool requires_grad);
 void print_tensor(Tensor* t);
 void free_tensor(Tensor* t);

@@ -7,12 +7,13 @@
 Tensor* create_1D_tensor(f32 data, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
     t->data = malloc(sizeof(f32));
-    *(t->data) = data; // is this safe?
+    *(t->data) = data;
     t->shape = malloc(sizeof(u32));
     t->shape[0] = 1;
     t->size = 1;
     t->num_dims = 1;
-    t->grad = 0.0f;
+    t->grad = malloc(sizeof(f32));
+    t->grad[0] = 0.0f;
     t->grad_op = None;
     t->requires_grad = requires_grad;
     t->is_leaf = true;
@@ -22,14 +23,11 @@ Tensor* create_1D_tensor(f32 data, bool requires_grad) {
     return t;
 }
 
-Tensor* create_2D_tensor(f32* data, u32* shape, bool requires_grad) {
+Tensor* create_tensor(f32* data, u32* shape, u32 num_dims, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
 
-    u32 num_dims = 2;
     t->shape = malloc(num_dims * sizeof(u32));
-    for (u32 i = 0; i < num_dims; i++) {
-        t->shape[i] = shape[i];
-    }
+    memcpy(t->shape, shape, num_dims * sizeof(u32));
 
     u32 num_values = 1;
     for (u32 i = 0; i < num_dims; i++) {
@@ -41,7 +39,10 @@ Tensor* create_2D_tensor(f32* data, u32* shape, bool requires_grad) {
     t->size = num_values;
     t->num_dims = num_dims;
     
-    t->grad = 0.0f;
+    t->grad = malloc(sizeof(f32) * num_values);
+    for (u32 i = 0; i < num_values; i++) {
+        t->grad[i] = 0.0f;
+    }
     t->grad_op = None;
     t->requires_grad = requires_grad;
     t->is_leaf = true;
@@ -52,7 +53,7 @@ Tensor* create_2D_tensor(f32* data, u32* shape, bool requires_grad) {
     return t;
 }
 
-Tensor* create_zero_tensor(u32* shape, u32 num_dims, bool requires_grad) {
+Tensor* create_zeros_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
     u32 num_values = 1;
     for (u32 i = 0; i < num_dims; i++) {
@@ -72,8 +73,11 @@ Tensor* create_zero_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     t->size = num_values;
     t->num_dims = num_dims;
 
-    t->grad = 0.0f;
-    
+    t->grad = malloc(sizeof(f32) * num_values);
+    for (u32 i = 0; i < num_values; i++) {
+        t->grad[i] = 0.0f;
+    }
+
     t->grad_op = None;
     t->requires_grad = requires_grad;
     t->is_leaf = true;
@@ -105,8 +109,11 @@ Tensor* create_ones_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     t->size = num_values;
     t->num_dims = num_dims;
 
-    t->grad = 0.0f;
-    
+    t->grad = malloc(sizeof(f32) * num_values);
+    for (u32 i = 0; i < num_values; i++) {
+        t->grad[i] = 0.0f;
+    }
+
     t->grad_op = None;
     t->requires_grad = requires_grad;
     t->is_leaf = true;

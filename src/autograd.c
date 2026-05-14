@@ -23,10 +23,10 @@ void add_backward(Tensor* t) {
     Tensor* b = t->next_functions[1];
     
     if (a->requires_grad) {
-        a->grad += t->grad;
+        a->grad[0] += t->grad[0];
     }
     if (b->requires_grad) {
-        b->grad += t->grad;
+        b->grad[0] += t->grad[0];
     }
 }
 
@@ -35,10 +35,10 @@ void mul_backward(Tensor* t) {
     Tensor* b = t->next_functions[1];
 
     if (a->requires_grad) {
-        a->grad += t->grad * b->data[0];
+        a->grad[0] += t->grad[0] * b->data[0];
     }
     if (b->requires_grad) {
-        b->grad += t->grad * a->data[0];
+        b->grad[0] += t->grad[0] * a->data[0];
     }
 }
 
@@ -47,9 +47,9 @@ void div_backward(Tensor* t) {
     Tensor* b = t->next_functions[1];
 
     if (a->requires_grad) {
-        a->grad += t->grad / b->data[0];
+        a->grad[0] += t->grad[0] / b->data[0];
     }
     if (b->requires_grad) {
-        b->grad += -t->grad * a->data[0] / (b->data[0] * b->data[0]);
+        b->grad[0] += -t->grad[0] * a->data[0] / (b->data[0] * b->data[0]);
     }
 }

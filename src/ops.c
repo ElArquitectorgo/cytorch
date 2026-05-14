@@ -3,7 +3,7 @@
 #include <assert.h>
 
 Tensor* add(Tensor* a, Tensor* b) {
-    Tensor* t = create_zero_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
+    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
 
     for (u32 i = 0; i < a->size; i++) {
         t->data[i] = a->data[i] + b->data[i];
@@ -22,7 +22,7 @@ Tensor* add(Tensor* a, Tensor* b) {
 }
 
 Tensor* mul(Tensor* a, Tensor* b) {
-    Tensor* t = create_zero_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
+    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
 
     for (u32 i = 0; i < a->size; i++) {
         t->data[i] = a->data[i] * b->data[i];
@@ -49,7 +49,7 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
     assert(n == b->shape[0]);
 
     u32 shape[2] = {m, o};
-    Tensor* t = create_zero_tensor(shape, 2, a->requires_grad || b->requires_grad);
+    Tensor* t = create_zeros_tensor(shape, 2, a->requires_grad || b->requires_grad);
     for (u32 row = 0; row < m; row++) {
         for (u32 col = 0; col < o; col++) {
             f32 sum = 0.0f;
@@ -63,7 +63,7 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
 }
 
 Tensor* divide(Tensor* a, Tensor* b) {
-    Tensor* t = create_zero_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
+    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
 
     for (u32 i = 0; i < a->size; i++) {
         t->data[i] = a->data[i] / b->data[i];

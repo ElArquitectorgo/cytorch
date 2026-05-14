@@ -31,7 +31,7 @@ int main() {
     Tensor* j = add(i, h);
 
     Tensor* k = mul(j, i);
-    k->grad = 1.0f; // Set the gradient of the output tensor to 1 for backpropagation
+    k->grad[0] = 1.0f; // Set the gradient of the output tensor to 1 for backpropagation
     backward(k);
 
     assert("a.data", a->data[0], 2.0);
@@ -47,17 +47,17 @@ int main() {
     assert("k.data", k->data[0], 80.0);
 
     // GRADS
-    assert("a.grad", a->grad, 0.0);
-    assert("b.grad", b->grad, 0.0);
-    assert("c.grad", c->grad, 36.0);
-    assert("d.grad", d->grad, 0.0);
-    assert("e.grad", e->grad, 18.0);
-    assert("f.grad", f->grad, 0.0);
-    assert("g.grad", g->grad, 9.0);
-    assert("h.grad", h->grad, -64.0);
-    assert("i.grad", i->grad, 18.0);
-    assert("j.grad", j->grad, 8.0);
-    assert("k.grad", k->grad, 1.0);
+    assert("a.grad", a->grad[0], 0.0);
+    assert("b.grad", b->grad[0], 0.0);
+    assert("c.grad", c->grad[0], 36.0);
+    assert("d.grad", d->grad[0], 0.0);
+    assert("e.grad", e->grad[0], 18.0);
+    assert("f.grad", f->grad[0], 0.0);
+    assert("g.grad", g->grad[0], 9.0);
+    assert("h.grad", h->grad[0], -64.0);
+    assert("i.grad", i->grad[0], 18.0);
+    assert("j.grad", j->grad[0], 8.0);
+    assert("k.grad", k->grad[0], 1.0);
 
     free_tensor(a);
     free_tensor(b);
