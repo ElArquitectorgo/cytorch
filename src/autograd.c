@@ -10,6 +10,9 @@ void backward(Tensor* t) {
     if (t->grad_op == MUL) {
         mul_backward(t);
     }
+    else if (t->grad_op == MAT_MUL) {
+        mat_mul_backward(t);
+    }
     else if (t->grad_op == DIV) {
         div_backward(t);
     }

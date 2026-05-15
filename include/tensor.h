@@ -6,6 +6,7 @@
 
 typedef enum { 
     MUL,
+    MAT_MUL,
     DIV,
     ADD,
     None,

@@ -82,5 +82,10 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
             t->data[row * o + col] = sum;
         }
     }
+
+    if (t->requires_grad) {
+        t->grad_op = MAT_MUL;
+    }
+    
     return t;
 }
