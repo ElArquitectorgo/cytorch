@@ -1,6 +1,7 @@
 #include "ops.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 
 Tensor* add(Tensor* a, Tensor* b) {
     Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
@@ -65,7 +66,10 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
     u32 n = a->shape[1];
     u32 o = b->shape[1];
 
-    assert(n == b->shape[0]);
+    if (n != b->shape[0]) {
+        printf("Shape mismatch: (%u,%u) x (%u,%u)\n", m, n, b->shape[0], b->shape[1]);
+        return NULL;
+    }
 
     u32 shape[2] = {m, o};
     Tensor* t = create_zeros_tensor(shape, 2, a->requires_grad || b->requires_grad);
