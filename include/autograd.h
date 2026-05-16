@@ -11,6 +11,7 @@ void div_backward(Tensor* t);
 void mat_add_backward(Tensor* t);
 void mat_mul_backward(Tensor* t);
 
-void ReLU_backward(Tensor* t);
+void relu_backward(Tensor* t);
+void softmax_backward(Tensor* t);
 
 #endif

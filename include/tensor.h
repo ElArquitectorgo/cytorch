@@ -10,6 +10,7 @@ typedef enum {
     DIV,
     MAT_ADD,
     RELU,
+    SOFTMAX,
     None,
 } op_type;
 

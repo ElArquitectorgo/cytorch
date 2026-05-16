@@ -20,7 +20,10 @@ void backward(Tensor* t) {
         mat_add_backward(t);
     }
     else if (t->grad_op == RELU) {
-        ReLU_backward(t);
+        relu_backward(t);
+    }
+    else if (t->grad_op == SOFTMAX) {
+        softmax_backward(t);
     }
     for (u8 i = 0; i < t->num_next_functions; i++) {
         backward(t->next_functions[i]);
@@ -110,11 +113,32 @@ void mat_mul_backward(Tensor* t) {
     }
 }
 
-void ReLU_backward(Tensor* t) {
+void relu_backward(Tensor* t) {
     Tensor* a = t->next_functions[0];
-    if (a->requires_grad) {
-        for (u32 i = 0; i < a->size; i++) {
-            a->grad[i] += (a->data[i] > 0) ? t->grad[i] : 0;
-        }
+
+    if (!a->requires_grad) {
+        return;
     }
+
+    for (u32 i = 0; i < a->size; i++) {
+        a->grad[i] += (a->data[i] > 0) ? t->grad[i] : 0;
+    }
+
+}
+
+void softmax_backward(Tensor* t) {
+    Tensor* a = t->next_functions[0];
+
+    if (!a->requires_grad) {
+        return;
+    }
+
+    f32 sum = 0.0f;
+    for (u32 i = 0; i < t->size; i++) {
+        sum += t->grad[i] * t->data[i];
+    }
+    for (u32 i = 0; i < t->size; i++) {
+        a->grad[i] += t->data[i] * (t->grad[i] - sum);
+    }
+
 }
