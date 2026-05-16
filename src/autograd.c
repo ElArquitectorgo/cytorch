@@ -16,23 +16,27 @@ void backward(Tensor* t) {
     else if (t->grad_op == DIV) {
         div_backward(t);
     }
-    else if (t->grad_op == ADD) {
-        add_backward(t);
+    else if (t->grad_op == MAT_ADD) {
+        mat_add_backward(t);
     }
     for (u8 i = 0; i < t->num_next_functions; i++) {
         backward(t->next_functions[i]);
     }
 }
 
-void add_backward(Tensor* t) {
+void mat_add_backward(Tensor* t) {
     Tensor* a = t->next_functions[0];
     Tensor* b = t->next_functions[1];
     
     if (a->requires_grad) {
-        a->grad[0] += t->grad[0];
+        for (u32 i = 0; i < a->size; i++) {
+            a->grad[i] += t->grad[i];
+        }
     }
     if (b->requires_grad) {
-        b->grad[0] += t->grad[0];
+        for (u32 i = 0; i < b->size; i++) {
+            b->grad[i] += t->grad[i];
+        }
     }
 }
 

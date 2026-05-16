@@ -21,7 +21,7 @@ int main() {
 
     Tensor* i = divide(g, h);
 
-    Tensor* j = add(i, h);
+    Tensor* j = mat_add(i, h);
 
     Tensor* k = mul(j, i);
     k->grad[0] = 1.0f; // Set the gradient of the output tensor to 1 for backpropagation

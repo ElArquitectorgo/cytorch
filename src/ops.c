@@ -3,33 +3,14 @@
 #include <assert.h>
 #include <stdio.h>
 
-Tensor* add(Tensor* a, Tensor* b) {
-    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
-
-    for (u32 i = 0; i < a->size; i++) {
-        t->data[i] = a->data[i] + b->data[i];
-    }
-    t->is_leaf = false;
-    
-    t->next_functions = malloc(2 * sizeof(Tensor*));
-    t->num_next_functions = 2;
-    t->next_functions[0] = a;
-    t->next_functions[1] = b;
-
-    if (t->requires_grad) {
-        t->grad_op = ADD;
-    }  
-    return t;
-}
-
 Tensor* mul(Tensor* a, Tensor* b) {
     Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
 
     for (u32 i = 0; i < a->size; i++) {
         t->data[i] = a->data[i] * b->data[i];
     }
-    t->is_leaf = false;
-    
+
+    t->is_leaf = false;  
     t->next_functions = malloc(2 * sizeof(Tensor*));
     t->num_next_functions = 2;
     t->next_functions[0] = a;
@@ -47,8 +28,8 @@ Tensor* divide(Tensor* a, Tensor* b) {
     for (u32 i = 0; i < a->size; i++) {
         t->data[i] = a->data[i] / b->data[i];
     }
+
     t->is_leaf = false;
-    
     t->next_functions = malloc(2 * sizeof(Tensor*));
     t->num_next_functions = 2;
     t->next_functions[0] = a;
@@ -82,10 +63,41 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
             t->data[row * o + col] = sum;
         }
     }
+    
+    t->is_leaf = false;
+    t->next_functions = malloc(2 * sizeof(Tensor*));
+    t->num_next_functions = 2;
+    t->next_functions[0] = a;
+    t->next_functions[1] = b;
 
     if (t->requires_grad) {
         t->grad_op = MAT_MUL;
     }
-    
+
+    return t;
+}
+
+Tensor* mat_add(Tensor* a, Tensor* b) {
+    // (m, n) + (m, n) = (m, n)
+    if (a->shape[0] != b->shape[0] || a->shape[1] != b->shape[1]) {
+        printf("Shape mismatch: (%u,%u) + (%u,%u)\n", a->shape[0], a->shape[1], b->shape[0], b->shape[1]);
+        return NULL;
+    }
+
+    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
+    for (u32 i = 0; i < a->size; i++) {
+        t->data[i] = a->data[i] + b->data[i];
+    }
+
+    t->is_leaf = false;
+    t->next_functions = malloc(2 * sizeof(Tensor*));
+    t->num_next_functions = 2;
+    t->next_functions[0] = a;
+    t->next_functions[1] = b;
+
+    if (t->requires_grad) {
+        t->grad_op = MAT_ADD;
+    }
+
     return t;
 }

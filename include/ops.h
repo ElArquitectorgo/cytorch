@@ -8,5 +8,6 @@ Tensor* mul(Tensor* a, Tensor* b);
 Tensor* divide(Tensor* a, Tensor* b);
 
 Tensor* mat_mul(Tensor* a, Tensor* b);
+Tensor* mat_add(Tensor* a, Tensor* b);
 
 #endif
