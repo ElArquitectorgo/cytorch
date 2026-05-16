@@ -101,3 +101,23 @@ Tensor* mat_add(Tensor* a, Tensor* b) {
 
     return t;
 }
+
+Tensor* ReLU(Tensor* a) {
+    Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad);
+
+    for (u32 i = 0; i < a->size; i++) {
+        t->data[i] = (a->data[i] > 0) ? a->data[i] : 0;
+    }
+
+    t->is_leaf = false;
+    t->next_functions = malloc(sizeof(Tensor*));
+    t->num_next_functions = 1;
+    t->next_functions[0] = a;
+
+    if (t->requires_grad) {
+        t->grad_op = RELU;
+    }
+
+    return t;
+
+}

@@ -9,6 +9,7 @@ typedef enum {
     MAT_MUL,
     DIV,
     MAT_ADD,
+    RELU,
     None,
 } op_type;
 

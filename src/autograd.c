@@ -19,6 +19,9 @@ void backward(Tensor* t) {
     else if (t->grad_op == MAT_ADD) {
         mat_add_backward(t);
     }
+    else if (t->grad_op == RELU) {
+        ReLU_backward(t);
+    }
     for (u8 i = 0; i < t->num_next_functions; i++) {
         backward(t->next_functions[i]);
     }
@@ -103,6 +106,15 @@ void mat_mul_backward(Tensor* t) {
                 }
                 b->grad[row * o + col] += sum;
             }
+        }
+    }
+}
+
+void ReLU_backward(Tensor* t) {
+    Tensor* a = t->next_functions[0];
+    if (a->requires_grad) {
+        for (u32 i = 0; i < a->size; i++) {
+            a->grad[i] += (a->data[i] > 0) ? t->grad[i] : 0;
         }
     }
 }
