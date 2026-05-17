@@ -159,18 +159,36 @@ Tensor* Softmax(Tensor* a) {
 }
 
 Tensor* cross_entropy_loss(Tensor* logits, Tensor* labels) {
+    // Implements log-softmax + Negative log likelihood loss
+  
     Tensor* t = create_zeros_tensor((u32[]){1}, 1, true);
+    
+    // To improve numerical stability, we subtract the max value from the input before exponentiating
+    f32 max_val = logits->data[0];
+    for (u32 i = 1; i < logits->size; i++) {
+        if (logits->data[i] > max_val) {
+            max_val = logits->data[i];
+        }
+    }
+
+    f32 sum = 0.0f;
+    for (u32 i = 0; i < logits->size; i++) {
+        sum += expf(logits->data[i] - max_val);
+    }
+    
+    f32 log_sum = logf(sum) + max_val;
     f32 loss = 0.0f;
     for (u32 i = 0; i < logits->size; i++) {
-        loss -= labels->data[i] * logf(logits->data[i] + 1e-8f);
+        loss -= labels->data[i] * (logits->data[i] - log_sum);
     }
+
     t->data[0] = loss;
     t->grad[0] = 1.0f;
     t->is_leaf = false;
     t->next_functions = malloc(sizeof(Tensor*));
     t->num_next_functions = 1;
     t->next_functions[0] = logits;
-    t->grad_op = None;
+    t->grad_op = CEL;
 
     return t;
 }

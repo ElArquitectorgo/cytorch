@@ -25,6 +25,9 @@ void backward(Tensor* t) {
     else if (t->grad_op == SOFTMAX) {
         softmax_backward(t);
     }
+    else if (t->grad_op == CEL) {
+        softmax_backward(t);
+    }
     for (u8 i = 0; i < t->num_next_functions; i++) {
         backward(t->next_functions[i]);
     }

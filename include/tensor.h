@@ -11,6 +11,7 @@ typedef enum {
     MAT_ADD,
     RELU,
     SOFTMAX,
+    CEL,
     None,
 } op_type;
 
