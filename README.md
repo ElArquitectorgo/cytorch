@@ -33,12 +33,6 @@ $$
 x'_i = x_i - m
 $$
 
-This transformation does not change the result because:
-
-$$
-\frac{\exp(x_i)}{\sum_j \exp(x_j)} = \frac{\exp(x_i - m)}{\sum_j \exp(x_j - m)}
-$$
-
 Therefore, the stabilized log-softmax becomes:
 
 $$
