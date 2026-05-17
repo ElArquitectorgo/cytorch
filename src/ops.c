@@ -120,7 +120,6 @@ Tensor* ReLU(Tensor* a) {
     }
 
     return t;
-
 }
 
 Tensor* Softmax(Tensor* a) {
@@ -163,25 +162,31 @@ Tensor* cross_entropy_loss(Tensor* logits, Tensor* labels) {
   
     Tensor* t = create_zeros_tensor((u32[]){1}, 1, true);
     
-    // To improve numerical stability, we subtract the max value from the input before exponentiating
-    f32 max_val = logits->data[0];
-    for (u32 i = 1; i < logits->size; i++) {
-        if (logits->data[i] > max_val) {
-            max_val = logits->data[i];
-        }
-    }
+    u32 batch = logits->shape[0];
+    u32 classes = logits->shape[1];
 
-    f32 sum = 0.0f;
-    for (u32 i = 0; i < logits->size; i++) {
-        sum += expf(logits->data[i] - max_val);
-    }
-    
-    f32 log_sum = logf(sum) + max_val;
     f32 loss = 0.0f;
-    for (u32 i = 0; i < logits->size; i++) {
-        loss -= labels->data[i] * (logits->data[i] - log_sum);
+
+    for (u32 b = 0; b < batch; b++) {
+        // To improve numerical stability, we subtract the max value from the input before exponentiating
+        f32 max_val = logits->data[b * classes];
+        for (u32 c = 1; c < classes; c++) {
+            if (logits->data[b * classes + c] > max_val) {
+                max_val = logits->data[b * classes + c];
+            }
+        }
+
+        f32 sum = 0.0f;
+        for (u32 c = 0; c < classes; c++) {
+            sum += expf(logits->data[b * classes + c] - max_val);
+        }
+        
+        f32 log_sum = logf(sum) + max_val;
+        u32 target = (u32)labels->data[b];
+        loss -= logits->data[b * classes + target] - log_sum;
     }
 
+    loss /= batch;
     t->data[0] = loss;
     t->grad[0] = 1.0f;
     t->is_leaf = false;

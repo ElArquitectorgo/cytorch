@@ -14,4 +14,6 @@ void mat_mul_backward(Tensor* t);
 void relu_backward(Tensor* t);
 void softmax_backward(Tensor* t);
 
+void cross_entropy_loss_backward(Tensor* t, Tensor* labels);
+
 #endif

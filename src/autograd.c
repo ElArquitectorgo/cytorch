@@ -126,7 +126,6 @@ void relu_backward(Tensor* t) {
     for (u32 i = 0; i < a->size; i++) {
         a->grad[i] += (a->data[i] > 0) ? t->grad[i] : 0;
     }
-
 }
 
 void softmax_backward(Tensor* t) {
@@ -143,5 +142,38 @@ void softmax_backward(Tensor* t) {
     for (u32 i = 0; i < t->size; i++) {
         a->grad[i] += t->data[i] * (t->grad[i] - sum);
     }
+}
 
+void cross_entropy_loss_backward(Tensor* t, Tensor* labels) {
+    Tensor* logits = t->next_functions[0];
+
+    u32 batch = logits->shape[0];
+    u32 classes = logits->shape[1];
+
+    for (u32 b = 0; b < batch; b++) {
+        f32 max_val = logits->data[b * classes];
+        
+        for (u32 c = 1; c < classes; c++) {
+            if (logits->data[b * classes + c] > max_val) {
+                max_val = logits->data[b * classes + c];
+            }
+        }
+        
+        f32 sum = 0.0f;
+        for (u32 c = 0; c < classes; c++) {
+            sum += expf(logits->data[b * classes + c] - max_val);
+        }
+
+        for (u32 c = 0; c < classes; c++) {
+            f32 grad = expf(logits->data[b * classes + c] - max_val) / sum;
+            u32 target = (u32)labels->data[b];
+
+            if (c == target) {
+                grad -= 1.0f;
+            }
+            grad /= batch;
+
+            logits->grad[b * classes + c] += grad;
+        }
+    }
 }
