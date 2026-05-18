@@ -22,6 +22,7 @@ typedef struct Tensor {
     u8 num_dims;
     f32* grad;
     op_type grad_op;
+    f32* velocity;
     struct Tensor* labels;
     struct Tensor** next_functions;
     u8 num_next_functions;
