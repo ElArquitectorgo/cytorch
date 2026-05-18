@@ -38,14 +38,33 @@ void mat_add_backward(Tensor* t) {
     Tensor* a = t->next_functions[0];
     Tensor* b = t->next_functions[1];
     
+    bool broadcast = a->shape[1] == b->shape[0] && b->num_dims == 1;
+
     if (a->requires_grad) {
         for (u32 i = 0; i < a->size; i++) {
             a->grad[i] += t->grad[i];
         }
     }
+    
     if (b->requires_grad) {
-        for (u32 i = 0; i < b->size; i++) {
-            b->grad[i] += t->grad[i];
+        if (broadcast) {
+            u32 rows = a->shape[0];
+            u32 cols = a->shape[1];
+
+            for (u32 col = 0; col < cols; col++) {
+                f32 sum = 0.0f;
+                
+                for (u32 row = 0; row < rows; row++) {
+                    sum += t->grad[row * cols + col];
+                }
+
+                b->grad[col] += sum;
+            }
+        }
+        else {
+            for (u32 i = 0; i < b->size; i++) {
+                b->grad[i] += t->grad[i];
+            }
         }
     }
 }

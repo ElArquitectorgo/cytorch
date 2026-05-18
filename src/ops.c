@@ -80,14 +80,25 @@ Tensor* mat_mul(Tensor* a, Tensor* b) {
 
 Tensor* mat_add(Tensor* a, Tensor* b) {
     // (m, n) + (m, n) = (m, n)
-    if (a->shape[0] != b->shape[0] || a->shape[1] != b->shape[1]) {
+    bool broadcast = a->shape[1] == b->shape[0] && b->num_dims == 1;
+    if (!broadcast && (a->shape[0] != b->shape[0] || a->shape[1] != b->shape[1])) {
         printf("Shape mismatch: (%u,%u) + (%u,%u)\n", a->shape[0], a->shape[1], b->shape[0], b->shape[1]);
         return NULL;
     }
 
     Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad || b->requires_grad);
-    for (u32 i = 0; i < a->size; i++) {
-        t->data[i] = a->data[i] + b->data[i];
+    
+    if (broadcast) {
+        for (u32 row = 0; row < a->shape[0]; row++) {
+            for (u32 col = 0; col < a->shape[1]; col++) {
+                t->data[row * a->shape[1] + col] = a->data[row * a->shape[1] + col] + b->data[col];
+            }
+        }
+    }
+    else {
+        for (u32 i = 0; i < a->size; i++) {
+            t->data[i] = a->data[i] + b->data[i];
+        }
     }
 
     t->is_leaf = false;
