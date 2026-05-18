@@ -126,23 +126,28 @@ Tensor* Softmax(Tensor* a) {
     // e^x_i / sum(e^x_j)
     Tensor* t = create_zeros_tensor(a->shape, a->num_dims, a->requires_grad);
 
-    // To improve numerical stability, we subtract the max value from the input before exponentiating
-    f32 max_val = a->data[0];
-    for (u32 i = 1; i < a->size; i++) {
-        if (a->data[i] > max_val) {
-            max_val = a->data[i];
+    u32 batch = a->shape[0];
+    u32 cols = a->shape[1];
+
+    for (u32 b = 0; b < batch; b++) {
+        // To improve numerical stability, we subtract the max value from the input before exponentiating
+        f32 max_val = a->data[b * cols];
+        for (u32 i = 1; i < cols; i++) {
+            if (a->data[b * cols + i] > max_val) {
+                max_val = a->data[b * cols + i];
+            }
         }
-    }
 
-    f32 sum = 0.0f;
-    for (u32 i = 0; i < a->size; i++) {
-        f32 z = expf(a->data[i] - max_val);
-        t->data[i] = z;
-        sum += z;
-    }
+        f32 sum = 0.0f;
+        for (u32 i = 0; i < cols; i++) {
+            f32 z = expf(a->data[b * cols + i] - max_val);
+            t->data[b * cols + i] = z;
+            sum += z;
+        }
 
-    for (u32 i = 0; i < a->size; i++) {
-        t->data[i] /= sum;
+        for (u32 i = 0; i < cols; i++) {
+            t->data[b * cols + i] /= sum;
+        }
     }
 
     t->is_leaf = false;
