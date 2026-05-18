@@ -190,6 +190,8 @@ Tensor* cross_entropy_loss(Tensor* logits, Tensor* labels) {
     t->data[0] = loss;
     t->grad[0] = 1.0f;
     t->is_leaf = false;
+    t->labels = malloc(sizeof(Tensor));
+    *(t->labels) = *labels;  // Store labels for backward pass
     t->next_functions = malloc(sizeof(Tensor*));
     t->num_next_functions = 1;
     t->next_functions[0] = logits;

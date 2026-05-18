@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 void backward(Tensor* t) {
     if (!t || t->visited) return;
@@ -26,7 +27,7 @@ void backward(Tensor* t) {
         softmax_backward(t);
     }
     else if (t->grad_op == CEL) {
-        softmax_backward(t);
+        cross_entropy_loss_backward(t);
     }
     for (u8 i = 0; i < t->num_next_functions; i++) {
         backward(t->next_functions[i]);
@@ -144,8 +145,9 @@ void softmax_backward(Tensor* t) {
     }
 }
 
-void cross_entropy_loss_backward(Tensor* t, Tensor* labels) {
+void cross_entropy_loss_backward(Tensor* t) {
     Tensor* logits = t->next_functions[0];
+    Tensor* labels = t->labels;
 
     u32 batch = logits->shape[0];
     u32 classes = logits->shape[1];

@@ -7,34 +7,21 @@
 
 
 int main() {
-    Tensor* a = create_tensor((f32[]){1, 2, 3, 1, 3, 1, 1, -1, -1},(u32[]){3, 3}, 2, true);
-    Tensor* b = create_tensor((f32[]){2, 2, 1, 3, 2, 2, 1, 3, 1}, (u32[]){3, 3}, 2, true);
-    Tensor* c = mat_mul(a, b);
-    
-    Tensor* d = create_ones_tensor((u32[]){3, 3}, 2, true);
-    Tensor* e = mat_add(c, d);
+    Tensor* logits = create_tensor((f32[]){2.0, 1.0, 0.1}, (u32[]){1, 3}, 2, true);
+    Tensor* labels = create_tensor((f32[]){0}, (u32[]){1, 1}, 2, false);
 
-    Tensor* f = ReLU(e);
+    Tensor* loss = cross_entropy_loss(logits, labels);
+    backward(loss);
 
-    for (u32 i = 0; i < f->size; i++) {
-        f->grad[i] = 1.0f;
-    }
-    backward(f);
-
+    printf("Loss: %f\n", loss->data[0]);
     printf("\nGradients:\n");
-    printf("a grad: %f\n", a->grad[0]);
-    printf("b grad: %f\n", b->grad[0]);
-    printf("c grad: %f\n", c->grad[0]);
-    printf("d grad: %f\n", d->grad[0]);
-    printf("e grad: %f\n", e->grad[0]);
-    printf("f grad: %f\n", f->grad[0]);
+    printf("logits grad: %f\n", logits->grad[0]);
+    printf("logits grad: %f\n", logits->grad[1]);
+    printf("logits grad: %f\n", logits->grad[2]);
 
-    free_tensor(a);
-    free_tensor(b);
-    free_tensor(c);
-    free_tensor(d);
-    free_tensor(e);
-    free_tensor(f);
+    free_tensor(logits);
+    free_tensor(labels);
+    free_tensor(loss);
 
     return 0;
 }
