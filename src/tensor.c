@@ -2,7 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <time.h>
 
+f32 random_normal() {
+    f32 u1 = (f32)rand() / RAND_MAX;
+    f32 u2 = (f32)rand() / RAND_MAX;
+    return sqrtf(-2 * logf(u1)) * cosf(2 * 3.1415f * u2);
+}
 
 Tensor* create_1D_tensor(f32 data, bool requires_grad) {
     Tensor* t = malloc(sizeof(Tensor));
@@ -35,6 +42,39 @@ Tensor* create_tensor(f32* data, u32* shape, u32 num_dims, bool requires_grad) {
     }
     t->data = malloc(num_values * sizeof(f32));
     memcpy(t->data, data, num_values * sizeof(f32));
+
+    t->size = num_values;
+    t->num_dims = num_dims;
+    
+    t->grad = malloc(sizeof(f32) * num_values);
+    for (u32 i = 0; i < num_values; i++) {
+        t->grad[i] = 0.0f;
+    }
+    t->grad_op = None;
+    t->requires_grad = requires_grad;
+    t->is_leaf = true;
+    t->visited = false;
+
+    t->next_functions = NULL;
+    t->num_next_functions = 0;
+    return t;
+}
+
+Tensor* create_random_tensor(u32* shape, u32 num_dims, bool requires_grad) {
+    Tensor* t = malloc(sizeof(Tensor));
+
+    t->shape = malloc(num_dims * sizeof(u32));
+    memcpy(t->shape, shape, num_dims * sizeof(u32));
+
+    u32 num_values = 1;
+    for (u32 i = 0; i < num_dims; i++) {
+        num_values *= shape[i];
+    }
+    t->data = malloc(num_values * sizeof(f32));
+    srand(time(0));
+    for (u32 i = 0; i < num_values; i++) {
+        t->data[i] = random_normal();
+    }
 
     t->size = num_values;
     t->num_dims = num_dims;

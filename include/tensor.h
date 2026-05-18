@@ -32,6 +32,7 @@ typedef struct Tensor {
 
 Tensor* create_1D_tensor(f32 data, bool requires_grad);
 Tensor* create_tensor(f32* data, u32* shape, u32 num_dims, bool requires_grad);
+Tensor* create_random_tensor(u32* shape, u32 num_dims, bool requires_grad);
 Tensor* create_zeros_tensor(u32* shape, u32 num_dims, bool requires_grad);
 Tensor* create_ones_tensor(u32* shape, u32 num_dims, bool requires_grad);
 void print_tensor(Tensor* t);
