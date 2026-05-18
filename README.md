@@ -40,3 +40,59 @@ $$
 $$
 
 ---
+
+# Test
+```python
+import torch
+import torch.nn.functional as F
+
+# logits shape: (batch, classes)
+logits = torch.tensor([
+    [2.0, 1.0, 0.1],
+    [0.5, 2.5, 1.0]
+], requires_grad=True)
+
+# target class indices
+labels = torch.tensor([0, 2])
+
+# cross entropy loss
+loss = F.cross_entropy(logits, labels)
+
+print("Loss:")
+print(loss.item())
+
+# backward
+loss.backward()
+
+print("\nGradients:")
+print(logits.grad)
+```
+
+```bash
+>>> print(loss.item())
+1.1116927862167358
+>>> print(logits.grad)
+tensor([[-0.1705,  0.1212,  0.0493],
+        [ 0.0498,  0.3681, -0.4179]])
+
+```
+
+```c
+Tensor* logits = create_tensor((f32[]){2.0, 1.0, 0.1, 0.5, 2.5, 1.0}, (u32[]){2, 3}, 2, true);
+Tensor* labels = create_tensor((f32[]){0, 2}, (u32[]){2, 1}, 2, false);
+
+Tensor* loss = cross_entropy_loss(logits, labels);
+backward(loss);
+```
+
+```bash
+Loss: 1.111693
+
+Gradients:
+logits grad: -0.170499
+logits grad: 0.121216
+logits grad: 0.049283
+logits grad: 0.049812
+logits grad: 0.368062
+logits grad: -0.417874
+```

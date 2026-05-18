@@ -7,8 +7,8 @@
 
 
 int main() {
-    Tensor* logits = create_tensor((f32[]){2.0, 1.0, 0.1}, (u32[]){1, 3}, 2, true);
-    Tensor* labels = create_tensor((f32[]){0}, (u32[]){1, 1}, 2, false);
+    Tensor* logits = create_tensor((f32[]){2.0, 1.0, 0.1, 0.5, 2.5, 1.0}, (u32[]){2, 3}, 2, true);
+    Tensor* labels = create_tensor((f32[]){0, 2}, (u32[]){2, 1}, 2, false);
 
     Tensor* loss = cross_entropy_loss(logits, labels);
     backward(loss);
@@ -18,6 +18,9 @@ int main() {
     printf("logits grad: %f\n", logits->grad[0]);
     printf("logits grad: %f\n", logits->grad[1]);
     printf("logits grad: %f\n", logits->grad[2]);
+    printf("logits grad: %f\n", logits->grad[3]);
+    printf("logits grad: %f\n", logits->grad[4]);
+    printf("logits grad: %f\n", logits->grad[5]);
 
     free_tensor(logits);
     free_tensor(labels);

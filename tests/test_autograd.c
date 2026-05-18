@@ -5,6 +5,10 @@
 #include "ops.h"
 #include "autograd.h"
 
+bool compare(f32 a, f32 b, f32 tol) {
+    return ABS(a - b) < tol;
+}
+
 int main() {    
     Tensor* a = create_1D_tensor(2, false);
     Tensor* b = create_1D_tensor(2, false);
@@ -83,6 +87,24 @@ int main() {
 
     free_tensor(a);
     free_tensor(b);
+
+    Tensor* logits = create_tensor((f32[]){2.0, 1.0, 0.1, 0.5, 2.5, 1.0}, (u32[]){2, 3}, 2, true);
+    Tensor* labels = create_tensor((f32[]){0, 2}, (u32[]){2, 1}, 2, false);
+
+    Tensor* loss = cross_entropy_loss(logits, labels);
+    backward(loss);
+
+    assert(compare(loss->data[0], 1.111693, 1e-5));
+    assert(compare(logits->grad[0], -0.170499, 1e-5));
+    assert(compare(logits->grad[1], 0.121216, 1e-5));
+    assert(compare(logits->grad[2], 0.049283, 1e-5));
+    assert(compare(logits->grad[3], 0.049812, 1e-5));
+    assert(compare(logits->grad[4], 0.368062, 1e-5));
+    assert(compare(logits->grad[5], -0.417874, 1e-5));
+
+    free_tensor(logits);
+    free_tensor(labels);
+    free_tensor(loss);
 
     printf("All tests passed!\n");
 
