@@ -4,14 +4,7 @@
 #include "tensor.h"
 #include "ops.h"
 #include "autograd.h"
-
-void sgd_momentum_step(Tensor* t, f32 learning_rate, f32 momentum) {
-    for (u32 i = 0; i < t->size; i++) {
-        t->velocity[i] = momentum * t->velocity[i] - learning_rate * t->grad[i];
-        t->data[i] += t->velocity[i];
-        t->grad[i] = 0.0f;
-    }
-}
+#include "optimizers.h"
 
 int main() {
     Tensor* x = create_tensor((f32[]){1, 1, 1, 1, 0, 0, 0, 0},(u32[]){8, 1}, 2, false);
