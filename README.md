@@ -45,7 +45,9 @@ $$
 I'm using the OG formula from Sutskever et al. (2011)
 
 $$
-v_{t+1} = \mu v_t - \epsilon \nabla f(\theta_t) \\
+v_{t+1} = \mu v_t - \epsilon \nabla f(\theta_t)
+$$
+$$
 \theta_{t+1} = \theta_t + v_{t+1} 
 $$
 
