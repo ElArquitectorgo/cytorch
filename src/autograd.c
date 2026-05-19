@@ -35,6 +35,10 @@ void backward(Tensor* t) {
 }
 
 void mat_add_backward(Tensor* t) {
+    // Potential optimization:
+    // If there is not broadcasting, we can sum the gradients
+    // of b directly into a's loop.
+
     Tensor* a = t->next_functions[0];
     Tensor* b = t->next_functions[1];
     

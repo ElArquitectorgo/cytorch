@@ -20,26 +20,34 @@ int main() {
     u32 batch_size = 2;
     f32 learning_rate = 0.01f;
     f32 momentum = 0.9f;
-    for (u32 epoch = 0; epoch < 500; epoch++) {
-        Tensor* X_train = create_zeros_tensor((u32[]){batch_size, 1}, 2, false);
-        Tensor* y_train = create_zeros_tensor((u32[]){batch_size, 1}, 2, false);
-        for (u32 i = 0; i < batch_size; i++) {
-            X_train->data[i] = x->data[(epoch * batch_size + i) % x->size];
-            y_train->data[i] = labels->data[(epoch * batch_size + i) % labels->size];
-        }
+    for (u32 epoch = 0; epoch < 10; epoch++) {
+        printf("\nEpoch %u\n", epoch + 1);
 
-        printf("Epoch %u\n", epoch + 1);
-        Tensor* a = mat_mul(X_train, w_1);
-        Tensor* logits = mat_add(a, b_1);
-        //Tensor* logits = ReLU(hidden);
+        u32 num_batches = (x->shape[0]) / batch_size;
 
-        Tensor* loss = cross_entropy_loss(logits, y_train);
-        backward(loss);
-        
-        for (u32 i = 0; i < 2; i++) {
-            sgd_momentum_step(model[i], learning_rate, momentum);
+        for (u32 batch = 0; batch < num_batches; batch++) {
+            Tensor* X_train = create_zeros_tensor((u32[]){batch_size, 1}, 2, false);
+            Tensor* y_train = create_zeros_tensor((u32[]){batch_size, 1}, 2, false);
+            for (u32 i = 0; i < batch_size; i++) {
+                X_train->data[i] = x->data[(batch * batch_size + i) % x->shape[0]];
+                y_train->data[i] = labels->data[(batch * batch_size + i) % labels->shape[0]];
+            }
+
+            
+
+            Tensor* a = mat_mul(X_train, w_1);
+            Tensor* logits = mat_add(a, b_1);
+            //Tensor* logits = ReLU(hidden);
+
+            Tensor* loss = cross_entropy_loss(logits, y_train);
+            backward(loss);
+
+            for (u32 i = 0; i < 2; i++) {
+                sgd_momentum_step(model[i], learning_rate, momentum);
+            }
+            printf("\rLoss: %f\r", loss->data[0]);
+            fflush(stdout);
         }
-        printf("Loss: %f\n", loss->data[0]);
     }
 
     free_tensor(x);

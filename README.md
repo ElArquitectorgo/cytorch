@@ -40,7 +40,8 @@ $$
 ---
 
 # Optimizer
-I'm using the OG formula from Sutskever et al. (2011)
+I'm using the OG stochastic gradient descent
+with momentum formula from Sutskever et al. (2011):
 
 $$
 v_{t+1} = \mu v_t - \epsilon \nabla f(\theta_t)
@@ -51,7 +52,9 @@ $$
 
 For some reason, PyTorch uses a different one and doesn't even properly reference the original.
 
-# Test
+# Tests
+There are some tests that can be run using `make test` to ensure that the mathematical operations and gradient calculations are correct. The expected values are derived from performing the same operations in PyTorch. 
+
 ```python
 import torch
 import torch.nn.functional as F

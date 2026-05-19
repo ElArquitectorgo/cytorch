@@ -12,5 +12,6 @@ void sgd_momentum_step(Tensor* t, f32 learning_rate, f32 momentum) {
         t->velocity[i] = momentum * t->velocity[i] - learning_rate * t->grad[i];
         t->data[i] += t->velocity[i];
         t->grad[i] = 0.0f;
+        //t->visited = false;
     }
 }
