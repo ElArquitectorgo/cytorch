@@ -19,8 +19,6 @@ $$
 
 ---
 
-## Numerical stability trick
-
 Let:
 
 $$
