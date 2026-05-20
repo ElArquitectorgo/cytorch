@@ -6,15 +6,32 @@
 #include "autograd.h"
 #include "optimizers.h"
 
+
+Tensor* load_dataset(const char* file_name, u32 rows, u32 cols) {
+    Tensor* x = create_zeros_tensor((u32[]){rows, cols}, 2, false);
+
+    FILE* f = fopen(file_name, "rb");
+
+    fseek(f, 0, SEEK_END);
+    u64 size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    fread(x->data, 1, size, f);
+
+    fclose(f);
+
+    return x;
+}
+
 int main() {
-    Tensor* x = create_tensor((f32[]){1, 1, 1, 1, 0, 0, 0, 0},(u32[]){8, 1}, 2, false);
-    Tensor* labels = create_tensor((f32[]){0, 0, 0, 0, 1, 1, 1, 1}, (u32[]){8, 1}, 2, false);
+    Tensor* x = load_dataset("dataset/train_data_mnist.bin", 60000, 784);
+    Tensor* labels = load_dataset("dataset/train_labels_mnist.bin", 60000, 1);
 
-    Tensor* w_1 = create_random_tensor((u32[]){1, 4}, 2, true);
-    Tensor* b_1 = create_random_tensor((u32[]){4}, 1, true);
+    Tensor* w_1 = create_random_tensor((u32[]){784, 64}, 2, true);
+    Tensor* b_1 = create_random_tensor((u32[]){64}, 1, true);
 
-    Tensor* w_2 = create_random_tensor((u32[]){4, 4}, 2, true);
-    Tensor* b_2 = create_random_tensor((u32[]){4}, 1, true);
+    Tensor* w_2 = create_random_tensor((u32[]){64, 32}, 2, true);
+    Tensor* b_2 = create_random_tensor((u32[]){32}, 1, true);
 
     Tensor** model = malloc(4 * sizeof(Tensor*));
     model[0] = w_1;
@@ -22,7 +39,7 @@ int main() {
     model[2] = w_2;
     model[3] = b_2;
 
-    u32 batch_size = 2;
+    u32 batch_size = 64;
     f32 learning_rate = 0.01f;
     f32 momentum = 0.9f;
 
@@ -32,7 +49,7 @@ int main() {
         u32 num_batches = x->shape[0] / batch_size;
 
         for (u32 batch = 0; batch < num_batches; batch++) {
-            Tensor* X_train = create_zeros_tensor((u32[]){batch_size, 1}, 2, false);
+            Tensor* X_train = create_zeros_tensor((u32[]){batch_size, 784}, 2, false);
             Tensor* y_train = create_zeros_tensor((u32[]){batch_size, 1}, 2, false);
             for (u32 i = 0; i < batch_size; i++) {
                 X_train->data[i] = x->data[(batch * batch_size + i) % x->shape[0]];
@@ -51,7 +68,7 @@ int main() {
             for (u32 i = 0; i < 4; i++) {
                 sgd_momentum_step(model[i], learning_rate, momentum);
             }
-            
+
             printf("Batch %u/%u | Loss: %f\r", batch + 1, num_batches, loss->data[0]);
             fflush(stdout);
 
