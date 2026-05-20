@@ -26,6 +26,7 @@ Tensor* create_1D_tensor(f32 data, bool requires_grad) {
     t->requires_grad = requires_grad;
     t->is_leaf = true;
     t->visited = false;
+    t->labels = NULL; 
     t->next_functions = NULL;
     t->num_next_functions = 0;
     return t;
@@ -57,6 +58,7 @@ Tensor* create_tensor(f32* data, u32* shape, u32 num_dims, bool requires_grad) {
     t->is_leaf = true;
     t->visited = false;
 
+    t->labels = NULL; 
     t->next_functions = NULL;
     t->num_next_functions = 0;
     return t;
@@ -91,6 +93,7 @@ Tensor* create_random_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     t->is_leaf = true;
     t->visited = false;
 
+    t->labels = NULL; 
     t->next_functions = NULL;
     t->num_next_functions = 0;
     return t;
@@ -127,6 +130,7 @@ Tensor* create_zeros_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     t->is_leaf = true;
     t->visited = false;
 
+    t->labels = NULL; 
     t->next_functions = NULL;
     t->num_next_functions = 0;
     return t;
@@ -164,6 +168,7 @@ Tensor* create_ones_tensor(u32* shape, u32 num_dims, bool requires_grad) {
     t->is_leaf = true;
     t->visited = false;
 
+    t->labels = NULL; 
     t->next_functions = NULL;
     t->num_next_functions = 0;
     return t;
@@ -210,10 +215,19 @@ void print_tensor(Tensor* t) {
 }
 
 void free_tensor(Tensor* t) {
+    if (t == NULL) return;
+
     if (t->next_functions != NULL) {
         free(t->next_functions);
     }
+
     free(t->data);
     free(t->shape);
+    free(t->velocity);
+    free(t->grad);
+
+    if (t->labels != NULL) {
+        free_tensor(t->labels);
+    }
     free(t);
 }
