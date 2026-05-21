@@ -19,6 +19,7 @@ Tensor* create_1D_tensor(f32 data, bool requires_grad) {
     t->shape[0] = 1;
     t->size = 1;
     t->velocity = malloc(sizeof(f32));
+    t->velocity = 0;
     t->num_dims = 1;
     t->grad = malloc(sizeof(f32));
     t->grad[0] = 0.0f;
@@ -47,6 +48,9 @@ Tensor* create_tensor(f32* data, u32* shape, u32 num_dims, bool requires_grad) {
 
     t->size = num_values;
     t->velocity = malloc(num_values * sizeof(f32));
+    for (u32 i = 0; i < num_values; i++) {
+        t->velocity[i] = 0.0f;
+    }
     t->num_dims = num_dims;
     
     t->grad = malloc(sizeof(f32) * num_values);
@@ -75,13 +79,17 @@ Tensor* create_random_tensor(u32* shape, u32 num_dims, bool requires_grad) {
         num_values *= shape[i];
     }
     t->data = malloc(num_values * sizeof(f32));
-    srand(time(0));
+
+    f32 scale = sqrtf(2.0f / shape[0]);
     for (u32 i = 0; i < num_values; i++) {
-        t->data[i] = random_normal();
+        t->data[i] = random_normal() * scale;
     }
 
     t->size = num_values;
     t->velocity = malloc(num_values * sizeof(f32));
+    for (u32 i = 0; i < num_values; i++) {
+        t->velocity[i] = 0.0f;
+    }
     t->num_dims = num_dims;
     
     t->grad = malloc(sizeof(f32) * num_values);
@@ -118,6 +126,9 @@ Tensor* create_zeros_tensor(u32* shape, u32 num_dims, bool requires_grad) {
 
     t->size = num_values;
     t->velocity = malloc(num_values * sizeof(f32));
+    for (u32 i = 0; i < num_values; i++) {
+        t->velocity[i] = 0.0f;
+    }
     t->num_dims = num_dims;
 
     t->grad = malloc(sizeof(f32) * num_values);
@@ -156,6 +167,9 @@ Tensor* create_ones_tensor(u32* shape, u32 num_dims, bool requires_grad) {
 
     t->size = num_values;
     t->velocity = malloc(num_values * sizeof(f32));
+    for (u32 i = 0; i < num_values; i++) {
+        t->velocity[i] = 0.0f;
+    }
     t->num_dims = num_dims;
 
     t->grad = malloc(sizeof(f32) * num_values);

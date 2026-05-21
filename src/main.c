@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #include "tensor.h"
 #include "ops.h"
@@ -24,6 +26,8 @@ Tensor* load_dataset(const char* file_name, u32 rows, u32 cols) {
 }
 
 int main() {
+    srand(time(0));
+
     Tensor* x = load_dataset("dataset/train_data_mnist.bin", 60000, 784);
     Tensor* labels = load_dataset("dataset/train_labels_mnist.bin", 60000, 1);
 
@@ -33,14 +37,19 @@ int main() {
     Tensor* w_2 = create_random_tensor((u32[]){64, 32}, 2, true);
     Tensor* b_2 = create_random_tensor((u32[]){32}, 1, true);
 
-    Tensor** model = malloc(4 * sizeof(Tensor*));
+    Tensor* w_3 = create_random_tensor((u32[]){32, 10}, 2, true);
+    Tensor* b_3 = create_random_tensor((u32[]){10}, 1, true);
+
+    Tensor** model = malloc(6 * sizeof(Tensor*));
     model[0] = w_1;
     model[1] = b_1;
     model[2] = w_2;
     model[3] = b_2;
+    model[4] = w_3;
+    model[5] = b_3;
 
     u32 batch_size = 64;
-    f32 learning_rate = 0.01f;
+    f32 learning_rate = 0.001f;
     f32 momentum = 0.9f;
 
     for (u32 epoch = 0; epoch < 100; epoch++) {
@@ -50,23 +59,30 @@ int main() {
 
         for (u32 batch = 0; batch < num_batches; batch++) {
             Tensor* X_train = create_zeros_tensor((u32[]){batch_size, 784}, 2, false);
-            Tensor* y_train = create_zeros_tensor((u32[]){batch_size, 1}, 2, false);
+            Tensor* y_train = create_zeros_tensor((u32[]){batch_size}, 1, false);
             for (u32 i = 0; i < batch_size; i++) {
-                X_train->data[i] = x->data[(batch * batch_size + i) % x->shape[0]];
-                y_train->data[i] = labels->data[(batch * batch_size + i) % labels->shape[0]];
+                u32 row = batch * batch_size + i;
+                memcpy(&X_train->data[i * 784], &x->data[row * 784], 784 * sizeof(f32));
+                y_train->data[i] = labels->data[row];
             }
 
             Tensor* xw_1 = mat_mul(X_train, w_1);
             Tensor* z_1 = mat_add(xw_1, b_1);
             Tensor* h_1 = ReLU(z_1);
+
             Tensor* hw_2 = mat_mul(h_1, w_2);
-            Tensor* logits = mat_add(hw_2, b_2);
+            Tensor* z_2 = mat_add(hw_2, b_2);
+            Tensor* h_2 = ReLU(z_2);
+
+            Tensor* hw_3 = mat_mul(h_2, w_3);
+            Tensor* logits = mat_add(hw_3, b_3);
 
             Tensor* loss = cross_entropy_loss(logits, y_train);
             backward(loss);
 
-            for (u32 i = 0; i < 4; i++) {
+            for (u32 i = 0; i < 6; i++) {
                 sgd_momentum_step(model[i], learning_rate, momentum);
+                model[i]->visited = false;
             }
 
             printf("Batch %u/%u | Loss: %f\r", batch + 1, num_batches, loss->data[0]);
@@ -76,6 +92,9 @@ int main() {
             free_tensor(z_1);
             free_tensor(h_1);
             free_tensor(hw_2);
+            free_tensor(z_2);
+            free_tensor(h_2);
+            free_tensor(hw_3);
             free_tensor(logits);
             free_tensor(loss);
 
@@ -91,6 +110,8 @@ int main() {
     free_tensor(b_1);
     free_tensor(w_2);
     free_tensor(b_2);
+    free_tensor(w_3);
+    free_tensor(b_3);
     free(model);
 
     return 0;

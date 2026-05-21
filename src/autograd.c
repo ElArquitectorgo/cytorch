@@ -115,7 +115,7 @@ void mat_mul_backward(Tensor* t) {
             for (u32 col = 0; col < n; col++) {
                 f32 sum = 0.0f;
                 for (u32 k = 0; k < o; k++) {
-                    sum += t->grad[row * o + k] * b->data[col * o + k];
+                    sum += t->grad[row * o + k] * b->data[k * o + col];
                 } 
                 a->grad[row * n + col] += sum;
             }
