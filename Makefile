@@ -8,7 +8,6 @@ TESTS=tests/test_autograd.c
 
 all:
 	$(CC) $(CFLAGS) $(SRC) -o cytorch $(LDFLAGS)
-	./cytorch
 
 test:
 	$(CC) $(CFLAGS) $(MAIN) $(TESTS) -o test $(LDFLAGS)
